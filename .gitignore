@@ -1,0 +1,7 @@
+*.swp
+temp
+gui
+spyce_gen__UI
+Simulation
+spyce_gen.code-workspace
+sypce_gen.code-workspace
