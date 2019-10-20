@@ -10,7 +10,12 @@ class HspiceWriter():
         self.__tx_pin = ""
         self.__file = file_obj
         self.__params = params
-        self.__stimuli = { "vin1": "_i", "stimuli_param": "", "ven1": "_en", "ven2": "_en" } #may need to pass this as arg
+        self.__stimuli = { 
+            "vin1": "_i", 
+            "stimuli_param": "", 
+            "ven1": "_en", 
+            "ven2": "_en" 
+            } #may need to pass this as arg
     
     def write_params(self):
         if self.__params.items():
@@ -73,6 +78,7 @@ class HspiceWriter():
 class IbisBuilder():
     """class containing dir/subdirs/files to be for HSPICE script"""
     def __init__(self, dir_path):
+        os.chdir(dir_path)
         self.__dir = dir_path
         self.__name = os.path.split(dir_path)[1]
         self.__subdirs = os.listdir(dir_path) #not necessary for every proj
@@ -87,7 +93,7 @@ class IbisBuilder():
         """return dict for s-param file and # of ports for each net"""
         tstone_dict = {}
         for subdir in self.__subdirs:
-            os.chdir(subdir)
+            os.chdir(os.path.join(self.__dir, subdir))
             if "S-Parameter" in os.listdir("."):
                 for file in os.listdir("S-Parameter"):
                     match = re.search(r"\.s(\d+)p$", file)
@@ -103,14 +109,18 @@ class IbisBuilder():
     def files(self):
         """Populates file_dict with subdir name as key and each value another dict with item:file as k:v pair"""
         file_dict = {}
-        os.chdir(self.__dir)
         for subdir in self.__subdirs:
-            for item in os.listdir(subdir):
+            os.chdir(os.path.join(self.__dir, subdir))
+            for item in os.listdir("."):
                 if os.path.isdir(item):
-                    os.chdir(item)
-                    for file in os.listdir(item): 
-                        if re.search(r".*\.(ibs|pkg)", file):
-                            file_dict[(subdir, item)].append(file)
+                    os.chdir(os.path.abspath(item))
+                    count = 0
+                    for file in os.listdir("."): 
+                        if re.search(r"(?:ibs|pkg)$", file):
+                            file_dict[(subdir, item, count)] = file
+                            count += 1
+                    os.chdir("..")
+
         return file_dict
 
     def yield_params(self):
@@ -129,7 +139,7 @@ class IbisBuilder():
                 "RX_pkg": "",
             }
 
-            for file_key in self.files:
+            for file_key in self.files.keys():
                 if subdir == file_key[0]:
                     comp_type = "RX" if params["TX"] else "TX"
                     params[comp_type] = file_key[1]
