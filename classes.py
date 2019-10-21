@@ -99,7 +99,7 @@ class IbisBuilder():
                     match = re.search(r"\.s(\d+)p$", file)
                     if match:
                         tstone_dict[subdir] = (file, int(match.group(1)))
-                        print(f"Found the tstonefile {0} for interface {1}".format(file, self.__name))
+                        print("Found the tstonefile {0} for interface {1}".format(file, self.__name))
             else:
                 print("ERROR: Could not find 'S-Parameter folder for subdir {}".format(subdir))
                 sys.exit(1)
@@ -143,11 +143,11 @@ class IbisBuilder():
                 if subdir == file_key[0]:
                     comp_type = "RX" if params["TX"] else "TX"
                     params[comp_type] = file_key[1]
-                    for file in self.files[file_key]:
-                        if re.search(r"(ibs)$", file):
-                            params[f"{comp_type}_ibs"] = file #change to list if needed
-                        elif re.search(r"(pkg)$", file):
-                            params[f"{comp_type}_pkg"] = file #change to list if needed
+                    file = self.files[file_key]
+                    if re.search(r"(?:ibs)$", file):
+                        params[f"{comp_type}_ibs"] = file #change to list if needed
+                    elif re.search(r"(?:pkg)$", file):
+                        params[f"{comp_type}_pkg"] = file #change to list if needed
             for tstone_key in self.tstones:
                 if subdir == tstone_key:
                     params["tstonefile"] = self.tstones[tstone_key][0]
@@ -160,20 +160,21 @@ class Netlist():
     comp_types = ["TX", "RX"]
     sim_types = ["typ", "ff", "ss"]
 
-    def __init__(self, params):
+    def __init__(self, params, root):
+        self.__dir = os.path.join(root, params["net_name"])
         self.__params = params
         self.__ports = self.__set_ports()
         self.__signals = self.__set_signals()
-        self.__driver = params["TX"]
-        self.__receiver = params["RX"]
+        self.driver = params["TX"]
+        self.receiver = params["RX"]
 
-    @property
-    def driver(self):
-        return self.__driver
+    # @property
+    # def driver(self):
+    #     return self.__driver
 
-    @property
-    def receiver(self):
-        return self.__receiver
+    # @property
+    # def receiver(self):
+    #     return self.__receiver
 
     @property
     def ports(self):
@@ -184,9 +185,9 @@ class Netlist():
         return self.__params["net_name"]
 
     def __set_ports(self):
-        os.chdir("S-Parameter")
+        os.chdir(os.path.join(self.__dir, "S-Parameter"))
         with open(self.__params["tstonefile"]) as tsfile:
-            return [ line for line in itertools.islice(tsfile, 3, 3 + (self.__params["num_of_ports"] - 1)) ]
+            return [ line for line in itertools.islice(tsfile, 3, 3 + (self.__params["num_of_ports"])) ]
 
     @property
     def signals(self):
@@ -203,9 +204,12 @@ class Netlist():
                 os.mkdir(comp_type)
 
             for port in self.ports:
-                comp_name = self.__params[comp_type]
-                signals.append(re.search(r"{0}_({1}.*)_{2}".format(self.__params["name"], comp_type, comp_name), port).group(1))
+                # comp_name = self.__params[comp_type]
+                match = re.search(r"_(" + comp_type + r"\w{2,3})_", port)
+                if match: signals.append(match.group(1)) 
         return set(signals) #need for typ ff ss
 
+    # @receiver.setter
+    # @driver.setter
     def swap_TX_RX(self):
         self.driver, self.receiver = self.receiver, self.driver

@@ -9,13 +9,15 @@ approach described by Gerard Meszaros
 in "xUnit Test Patterns: Refactoring Test Code" (2007).
 """
 
-# ===================
-# classes.IbisBuilder 
-# ===================
+# ==========================
+#   classes.IbisBuilder 
+# ==========================
+
+# Setup - global instance
+t_root = r"E:/uti/sim/Simulation/RGMII"
+t_ibisBuilder = IbisBuilder(t_root)
 
 def test_ibisBuilder_name():
-    # Setup
-    t_ibisBuilder = IbisBuilder("E:/uti/sim/Simulation/RGMII")
     
     # Execute
     name = t_ibisBuilder.name
@@ -25,9 +27,8 @@ def test_ibisBuilder_name():
 
     # TearDown
 
+
 def test_ibisBuilder_tstones():
-    # Setup
-    t_ibisBuilder = IbisBuilder("E:/uti/sim/Simulation/RGMII")
 
     # Execute
     tstones = t_ibisBuilder.tstones
@@ -38,9 +39,8 @@ def test_ibisBuilder_tstones():
 
     #TearDown
 
+
 def test_ibisBuilder_files():
-    # Setup
-    t_ibisBuilder = IbisBuilder("E:/uti/sim/Simulation/RGMII")
 
     # Execute
     files = t_ibisBuilder.files
@@ -53,8 +53,6 @@ def test_ibisBuilder_files():
 
 
 def test_ibisBuilder_yieldParams():
-    # Setup
-    t_ibisBuilder = IbisBuilder("E:/uti/sim/Simulation/RGMII")
 
     # Execute
     params = list(t_ibisBuilder.yield_params())
@@ -63,3 +61,72 @@ def test_ibisBuilder_yieldParams():
     assert params[0]["num_of_ports"] == 17
 
     #TearDown
+
+
+# ==========================
+#   classes.Netlist 
+# ==========================
+
+# Setup - global instance, params
+t_params = {
+    'if_name': 'RGMII', 
+    'net_name': 'RGMII_IZ01_IB01', 
+    'tstonefile': 'yyMMdd_test_tstonefile.s17p', 
+    'num_of_ports': 17, 
+    'TX': 'IB01', 
+    'TX_ibs': 'sak-tc397xe256f300sa.ibs', 
+    'TX_pkg': '', 
+    'RX': 'IZ01', 
+    'RX_ibs': 'e6352_e6176.ibs', 
+    'RX_pkg': 'sak-tc397xe256f300sa.pkg'
+    }
+t_netlist = Netlist(t_params, t_root)
+
+def test_netlist_props():
+    
+    # Execute 
+    actual_name = t_netlist.net_name
+    actual_receiver = t_netlist.receiver
+    actual_driver = t_netlist.driver
+    actual_signals = t_netlist.signals
+
+    # Verify
+    assert actual_name == t_params["net_name"]
+    assert actual_receiver == t_params["RX"]
+    assert actual_driver == t_params["TX"]
+    assert len(actual_signals) == 4
+
+    # TearDown
+
+
+def test_netlist_ports():
+
+    # Execute 
+    actual = t_netlist.ports
+
+    # Verify
+    assert isinstance(actual, list)
+    assert len(actual) == 17
+
+    # TearDown
+
+
+def test_netlist_swap():
+
+    # Setup
+    original_rx = t_netlist.receiver
+    original_tx = t_netlist.driver
+
+    # Execute
+    t_netlist.swap_TX_RX()
+
+    # Verify
+    assert t_netlist.receiver == original_tx
+    assert t_netlist.driver == original_rx
+
+    # TearDown
+
+
+# ==========================
+#   classes.HspiceWriter
+# ==========================

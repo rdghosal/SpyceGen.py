@@ -35,7 +35,7 @@ def main():
             if not get_user_conf(i_builder.name, params_str):
                 sys.exit(1)
 
-            netlist = Netlist(params)
+            netlist = Netlist(params, args.path)
             conf_items ={
                 "driver": netlist.driver,
                 "receiver": netlist.receiver
