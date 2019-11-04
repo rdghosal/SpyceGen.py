@@ -82,6 +82,7 @@ t_params = {
     }
 t_netlist = Netlist(t_params, t_root)
 
+
 def test_netlist_props():
     
     # Execute 

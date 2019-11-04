@@ -9,7 +9,7 @@ from classes import HspiceWriter, Netlist, IbisBuilder
 
 
 def main():
-    
+
     description = """
                     This program crawls through a Simulation directory to extract
                     paramaters used to substitute placeholders in a template and generate HSPICE scripts
@@ -49,30 +49,10 @@ def main():
                 os.chdir(comp_type)
                 sp_files = os.listdir(".")
 
-                for file in sp_files:
-                    with open(file, "a") as f:
-                        lines = f.readlines()
-                        writer = HspiceWriter(filename=file, file_obj=f, params=params)
-
-                        for line in lines: 
-                            writer.write_params() 
-                            if re.search(r"typ", line):
-                                writer.write_sim_type(line, type(netlist).comp_types)
-                            elif re.search(r"s\d_trace", line):
-                                writer.write_netlist(netlist)
-                            elif re.search(r"\<node_name\>", line):
-                                writer.write_nodes(line)
-                            # elif re.search(r"\<freq\>", line):
-                            #     writer.write_frequency(line, frequency)
-                            elif re.search(r"^v", line):
-                                writer.write_stimuli(line, netlist)
-                            elif re.search(r"^\+ v\(\<TX\)", line):
-                                writer.write_probes(line, comp_type="TX")
-                            elif re.search(r"^\+ v\(\<RX\)", line):
-                                writer.write_probes(line, comp_type="RX")
-
-                        f.writelines(lines)
-                        print(f"{file} written in folder {comp_type} of {if_dir}")
+                for sp_file in sp_files:
+                    hs_writer = HspiceWriter(sp_file, params)
+                    hs_writer.make_script(netlist)
+                    print(f"{sp_file} written in folder {comp_type} of {if_dir}") #print confirmation
 
             print(f"HSPICE files generated for net {netlist.net_name}")
 
