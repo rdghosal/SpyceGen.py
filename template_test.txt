@@ -47,7 +47,7 @@ s1_trace
 * Stimuli
 ****************************************************************************
 
-.param freq='<freq>'
+*.param freq='<freq>'
 .param clk='1/freq'
 .param trf='clk/10'
 .param width='clk/2-trf'

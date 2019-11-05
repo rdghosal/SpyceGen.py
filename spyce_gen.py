@@ -29,7 +29,7 @@ def main():
         i_builder = IbisBuilder(os.path.abspath(if_dir))
 
         for params in i_builder.yield_params():
-            params_str = stringify_params(params) # params into sep class
+            params_str = stringify_params(params)
             print(f"Using the following parameters for interface {i_builder.name} to generate HSPICE script:\n{params_str}")
             
             if not get_user_conf(i_builder.name, params_str):
@@ -52,7 +52,7 @@ def main():
                 for sp_file in sp_files:
                     hs_writer = HspiceWriter(sp_file, params)
                     hs_writer.make_script(netlist)
-                    print(f"{sp_file} written in folder {comp_type} of {if_dir}") #print confirmation
+                    print(f"{sp_file} written in folder {comp_type} of {if_dir}") # Print confirmation
 
             print(f"HSPICE files generated for net {netlist.net_name}")
 

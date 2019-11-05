@@ -27,9 +27,9 @@ class HspiceWriter():
                     del self.__params[key] # Reduce search time in subsequent iterations
                     break
 
-    def write_netlist(self, netlist, f):
+    def write_netlist(self, netlist, f_obj):
         # Writes ports extracted from tstonefile and sets nodes, rx_pin, and tx_pin of instance
-        f.write("\n")
+        f_obj.write("\n")
         for port in netlist.ports:
             for signal in netlist.signals:
                 comp_pin = "gnd"
@@ -41,7 +41,7 @@ class HspiceWriter():
                         self.__rx_pin = comp_pin
                     elif re.search(comp_pin, netlist.driver):
                         self.__tx_pin = comp_pin
-                f.write(f"+ {comp_pin}\t\t\t* " + port)
+                f_obj.write(f"+ {comp_pin}\t\t\t* " + port)
 
     def write_nodes(self, line):
         targets = ["<node_name>", "<node_name_1>", "<node_name_2>"] # need to replace res_value
@@ -111,7 +111,7 @@ class HspiceWriter():
 
 
 class IbisBuilder():
-    """Extracts parameters by crawling a directory input for instantiation"""
+    """Extracts parameters by crawling input directory"""
     def __init__(self, dir_path):
         os.chdir(dir_path)
         self.__dir = dir_path
@@ -125,7 +125,7 @@ class IbisBuilder():
 
     @property
     def tstones(self):
-        # Return dict for s-parameter file and number of ports for each net
+        # Returns dict for s-parameter file and number of ports for each net
         tstone_dict = {}
         for subdir in self.__subdirs:
             os.chdir(os.path.join(self.__dir, subdir))
@@ -190,7 +190,7 @@ class IbisBuilder():
 
 
 class Netlist():
-    """Navigates through simulation directory for template substitutes"""
+    """Extracts netlist parameters from tstonefile"""
     comp_types = ["TX", "RX"]
     sim_types = ["typ", "ff", "ss"]
 
@@ -201,7 +201,7 @@ class Netlist():
         self.__signals = self.__set_signals()
         self.driver = params["TX"]
         self.receiver = params["RX"]
-
+    
     @property
     def ports(self):
         return self.__ports
@@ -230,7 +230,8 @@ class Netlist():
             for port in self.ports:
                 # comp_name = self.__params[comp_type]
                 match = re.search(r"_(" + comp_type + r"\w{2,3})_", port)
-                if match: signals.append(match.group(1)) 
+                if match: 
+                    signals.append(match.group(1)) 
         return set(signals) # need for typ ff ss
 
     def swap_TX_RX(self):

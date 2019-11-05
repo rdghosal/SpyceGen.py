@@ -8,7 +8,9 @@ The following tests follow the four-phase
 approach described by Gerard Meszaros 
 in "xUnit Test Patterns: Refactoring Test Code" (2007).
 """
-
+# 
+#   __CLASSES__
+# 
 # ==========================
 #   classes.IbisBuilder 
 # ==========================
@@ -131,3 +133,66 @@ def test_netlist_swap():
 # ==========================
 #   classes.HspiceWriter
 # ==========================
+
+# Set up - global instance and dictionary for args in method testing
+
+# t_hswriter = HspiceWriter()
+
+t_lines = {
+    "ibis": [
+        "+ file='<TX_file>'",
+        "+ component='<TX_comp>'",
+        "+ package='<TX_package>'",
+        "+ pkgfile='<TX_pkg>'",
+        "*+ mod_sel='Selection_1='",
+    ], 
+    "sim_type": "+ typ=typ"
+}
+
+#
+#   __HELPER FUNCTIONS__
+#
+# ==========================
+#   helpers.stringify_params
+# ==========================
+
+def test_stringify_params():
+
+    # Setup
+    # arg `params` already prepared for `classes.Netlist` test
+    expected = """
+    Subdirectory/Net name: RGMII_IZ01_IB01
+    Driver name: IB01
+    Driver ibs file: sak-tc397xe256f300sa.ibs
+    Driver package: 
+    Receiver name: IZ01
+    Receiver ibs file: e6352_e6176.ibs
+    Receiver package: sak-tc397xe256f300sa.pkg
+    """
+
+    # Execute
+    actual = stringify_params(t_params)
+
+    # Verify
+    assert type(actual) == str
+    assert actual == expected
+
+    #  Teardown
+
+
+def test_clone_template():
+
+    # Setup
+    # Using Netlist instance from test `classes.Netlist`
+    t_temp_path = "E:\\uti\\sim\\template_test.txt"
+    tx_path = os.path.join(os.getcwd(), "TX")
+    rx_path = os.path.join(os.getcwd(), "RX")
+
+    # Execute
+    clone_template(t_netlist, t_temp_path)
+
+    # Verify
+    # Ensures typ, ff, ss versions have been generated for each script
+    for sim_type in Netlist.sim_types:
+        assert os.listdir(rx_path).index(f"rgmii_rxclk_{sim_type}_.sp") != -1 
+        assert os.listdir(tx_path).index(f"rgmii_txd2_{sim_type}_.sp") != -1 

@@ -4,7 +4,7 @@ from time import sleep
 
 
 def stringify_params(params):
-    # for params in params_list: #index over to allow logging 
+    """Formats params dict into appropriate str"""
     params_str = """
     Subdirectory/Net name: {0}
     Driver name: {1}
@@ -13,22 +13,35 @@ def stringify_params(params):
     Receiver name: {4}
     Receiver ibs file: {5}
     Receiver package: {6}
-    """.format(params["net_name"], params["driver"], 
-    params["driver_ibs"], params["driver_pkg"], params["receiver"], params["receiver_ibs"], params["receiver_pkg"])
-
+    """.format(params["net_name"], params["TX"],\
+        params["TX_ibs"], params["TX_pkg"],\
+        params["RX"], params["RX_ibs"], params["RX_pkg"])
     return params_str
 
+
 def clone_template(netlist, template_path):
+    """Clones template script file according to netlist instance"""
+    print(os.getcwd())
     for signal in netlist.signals:
         for sim_type in type(netlist).sim_types:
+            # Format file name according to current practices
+            end = netlist.net_name.find("_")
+            if_name = netlist.net_name[:end]
+            target_filename =  "{0}_{1}_{2}_.sp".format(if_name, signal, sim_type).lower() 
+            target_dir = ""
             for comp_type in type(netlist).comp_types:
-                target_filename =  "{0}_{1}_{2}_.sp".format(netlist.if_name, signal, sim_type).lower() 
-                target_dir = os.path.join(os.getcwd(), comp_type, target_filename)
+                # To ensure the RX/TX script files end up in their correct folder
+                if target_filename.find(comp_type.lower()) != -1:
+                    target_dir = os.path.join(os.getcwd(), comp_type)
+                    if not os.path.exists(target_dir):
+                        os.mkdir(target_dir)
+                        break
+            copyfile(template_path, os.path.join(target_dir, target_filename))
+            print("Generating file {0} in {1}".format(target_filename, target_dir))
 
-                copyfile(template_path, target_dir)
-                print("Generating file {0} in {1}".format(target_filename, target_dir))
 
 def get_user_conf(obj_name, param):
+    """Requests user to confirm the accuracy of given parameters"""
     print(f"Using the following parameters for {obj_name}:\n{param}")
     user_conf = ""
     while user_conf not in ["y", "n"]:
