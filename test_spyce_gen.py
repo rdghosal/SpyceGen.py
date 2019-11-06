@@ -136,7 +136,21 @@ def test_netlist_swap():
 
 # Set up - global instance and dictionary for args in method testing
 
-# t_hswriter = HspiceWriter()
+def test_make_script():
+    # Setup
+    t_spfile = os.path.join(os.getcwd(), "RX", "rgmii_rxclk_ff_.sp")
+    print(t_spfile)
+    t_hswriter = HspiceWriter(t_spfile, t_params) # `t_params` from `class.Netlist` test
+    expected_lines = []
+
+    # Execute
+    actual_lines = t_hswriter.make_script(t_netlist)
+
+    # Verify
+    assert expected_lines == actual_lines
+
+
+
 
 t_lines = {
     "ibis": [
@@ -194,5 +208,8 @@ def test_clone_template():
     # Verify
     # Ensures typ, ff, ss versions have been generated for each script
     for sim_type in Netlist.sim_types:
+        # Asserts files exist in directory
         assert os.listdir(rx_path).index(f"rgmii_rxclk_{sim_type}_.sp") != -1 
         assert os.listdir(tx_path).index(f"rgmii_txd2_{sim_type}_.sp") != -1 
+
+    # Teardown

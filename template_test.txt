@@ -12,21 +12,21 @@
 * IBIS Model
 ****************************************************************************
 
-.ibis <TX_name>
-+ file='<TX_file>'
+.ibis <TX>
++ file='<TX_ibs>'
 + component='<TX_comp>'
 + package='<TX_package>'
 + pkgfile='<TX_pkg>'
 *+ mod_sel='Selection_1='
-+ typ=typ
++ typ=<typ>
 
-.ibis <RX_name>
-+ file='<RX_file>'
+.ibis <RX>
++ file='<RX_ibs>'
 + component='<RX_comp>'
 + package='<RX_package>'
 + pkgfile='<RX_pkg>'
 *+ mod_sel='Selection_1='
-+ typ=typ
++ typ=<typ>
 
 
 ****************************************************************************
