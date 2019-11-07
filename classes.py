@@ -120,7 +120,9 @@ class HspiceWriter():
                     lines[i] = self.write_probes(lines[i], "TX")
                 elif re.search(r"v\(<RX", lines[i]):
                     lines[i] = self.write_probes(lines[i], "RX")
-            f.writelines(lines)
+            f.seek(0) # Move pointer to the start of the file
+            f.writelines(lines) # Append revised lines, putting pointer at the end of the last line
+            f.truncate() # Remove rest of the file, i.e., the template text
             # >> For testing
             # return lines
 
