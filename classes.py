@@ -132,6 +132,7 @@ class IbisBuilder():
         self.__dir = dir_path
         self.__name = os.path.split(dir_path)[1]
         self.__subdirs = os.listdir(dir_path) #not necessary for every proj
+        self.__tstones = self.__set_tstones()
         print("Fetching interface parameters for project {}".format(os.path.split(os.path.abspath(".."))[1]))
 
     @property
@@ -140,6 +141,9 @@ class IbisBuilder():
 
     @property
     def tstones(self):
+        return self.__tstones
+
+    def __set_tstones(self):
         # Returns dict for s-parameter file and number of ports for each net
         tstone_dict = {}
         for subdir in self.__subdirs:
@@ -149,12 +153,10 @@ class IbisBuilder():
                     match = re.search(r"\.s(\d+)p$", file)
                     if match:
                         tstone_dict[subdir] = (file, int(match.group(1)))
+                        print("Found the tstonefile {0} for interface {1}".format(tstone_dict[subdir][0], self.__name))
             else:
                 print("ERROR: Could not find 'S-Parameter folder for subdir {}".format(subdir))
                 sys.exit(1)
-        print("KEYS:", tstone_dict.keys())
-        # for key in tstone_dict:
-        #     print("Found the tstonefiles {0} for interface {1}".format(tstone_dict[key][0], self.__name))
         return tstone_dict   
 
     @property
@@ -190,7 +192,6 @@ class IbisBuilder():
                 "RX_ibs": "",
                 "RX_pkg": "",
             }
-
             for file_key in self.files.keys():
                 if subdir == file_key[0]:
                     comp_type = "RX" if params["TX"] else "TX"

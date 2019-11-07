@@ -5,15 +5,14 @@ from time import sleep
 
 def stringify_params(params):
     """Formats params dict into appropriate str"""
-    params_str = """
-    Subdirectory/Net name: {0}
+    params_str = """Subdirectory/Net name: {0}
     Driver name: {1}
     Driver ibs file: {2}
     Driver package: {3}
     Receiver name: {4}
     Receiver ibs file: {5}
-    Receiver package: {6}
-    """.format(params["net_name"], params["TX"],\
+    Receiver package: {6}""".\
+        format(params["net_name"], params["TX"],\
         params["TX_ibs"], params["TX_pkg"],\
         params["RX"], params["RX_ibs"], params["RX_pkg"])
     return params_str
@@ -21,7 +20,6 @@ def stringify_params(params):
 
 def clone_template(netlist, template_path):
     """Clones template script file according to netlist instance"""
-    print(os.getcwd())
     for signal in netlist.signals:
         for sim_type in type(netlist).sim_types:
             # Format file name according to current practices
@@ -37,18 +35,19 @@ def clone_template(netlist, template_path):
                         os.mkdir(target_dir)
                         break
             copyfile(template_path, os.path.join(target_dir, target_filename))
-            print("Generating file {0} in {1}".format(target_filename, target_dir))
+            print("Generating file {0}\n  in {1}".format(target_filename, target_dir))
+    print()
 
 
 def get_user_conf(obj_name, param):
     """Requests user to confirm the accuracy of given parameters"""
-    print(f"Using the following parameters for {obj_name}:\n{param}")
+    print(f"\nUsing the following parameters for {obj_name}:\n    {param}")
     user_conf = ""
     while user_conf not in ["y", "n"]:
         sleep(1)
-        user_conf = input("Are the above parameters correct? (y/n)")
+        user_conf = input("\nAre the above parameters correct? (y/n) ")
     if user_conf is "n":
-        print(f"An error occured. Please check {obj_name} and run this program again.")
+        print(f"\nAn error occured. Please check {obj_name} and run this program again.")
         return False
     else:
         return True

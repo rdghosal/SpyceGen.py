@@ -1,5 +1,4 @@
-#!usr/bin/env python
-
+#!usr/bin/env python3
 import os, re, sys, argparse
 from shutil import copyfile
 from time import sleep
@@ -32,7 +31,6 @@ def main():
 
         for params in i_builder.yield_params():
             params_str = stringify_params(params)
-            print(f"Using the following parameters for interface {i_builder.name} to generate HSPICE script:\n{params_str}")
             
             if not get_user_conf(i_builder.name, params_str):
                 sys.exit(1)
@@ -50,23 +48,22 @@ def main():
             for comp_type in type(netlist).comp_types:
                 os.chdir(os.path.join(os.getcwd(), comp_type))
                 sp_files = [ f for f in os.listdir(".") if re.search(r"\.sp$", f) ]
-                # print(sp_files)
                 for sp_file in sp_files:
-                #     # print(os.path.abspath(sp_file))
-                    # f = open(sp_file, "r")
-                    # print(f.read())
-                    # break
                     hs_writer = HspiceWriter(sp_file, params)
                     hs_writer.make_script(netlist)
-                #     print(f"{sp_file} written in folder {comp_type} of {if_dir}") # Print confirmation
+                    print(f"{sp_file} written in folder {comp_type} of {if_dir}") # Print confirmation
                 os.chdir("..")
+                print()
 
             print(f"HSPICE files generated for net {netlist.net_name}")
+            print()
 
         print(f"Completed generating HSPICE scripts for interface {i_builder.name}")
+        print()
     
     print(f"HSPICE file generation complete.")
-    input("Press any key to close the program.")
+    print()
+    input("Press any key to close the program.\n")
     sys.exit(0)
 
 

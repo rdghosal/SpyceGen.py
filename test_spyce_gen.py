@@ -174,15 +174,13 @@ def test_stringify_params():
 
     # Setup
     # arg `params` already prepared for `classes.Netlist` test
-    expected = """
-    Subdirectory/Net name: RGMII_IZ01_IB01
+    expected = """Subdirectory/Net name: RGMII_IZ01_IB01
     Driver name: IB01
     Driver ibs file: sak-tc397xe256f300sa.ibs
     Driver package: 
     Receiver name: IZ01
     Receiver ibs file: e6352_e6176.ibs
-    Receiver package: sak-tc397xe256f300sa.pkg
-    """
+    Receiver package: sak-tc397xe256f300sa.pkg"""
 
     # Execute
     actual = stringify_params(t_params)
