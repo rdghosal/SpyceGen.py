@@ -10,24 +10,9 @@ class HspiceWriter():
         self.__rx_pin = ""
         self.__tx_pin = ""
         self.__params = params.copy() # Avoid side effects while being mutable for methods
-        self.__stimuli = { 
-            "vin1": "_i", 
-            "stimuli_param": "", 
-            "ven1": "_en", 
-            "ven2": "_en" 
-        } # may need to pass this as arg
     
-    def __append_node(self, value):
-        self.__nodes.append(value)
-
-    def __set_rx_pin(self, value):
-        self.__rx_pin = value
-    
-    def __set_tx_pin(self, value):
-        self.__tx_pin = value
-
     def write_params(self, line):
-        # Appends Ibis model parameters to script
+        # Appends Ibis model parameters to the IBIS Model section of the HSPICE script
         if self.__params:
             for key, value in self.__params.items():
                 match = re.search(r"(<" + key + r">)", line)
@@ -37,37 +22,39 @@ class HspiceWriter():
                     break
         return line
 
-    def write_netlist(self, netlist, f_obj):
-        # Writes ports extracted from tstonefile and sets nodes, rx_pin, and tx_pin of instance
-        f_obj.write("\n")
+    def write_port(self, netlist):
+        # Writes ports extracted from tstonefile to the Netlist section of the HSPICE script
+        # and sets nodes, rx_pin, and tx_pin of instance
         for port in netlist.ports:
+            comp_pin = ""
             for signal in netlist.signals:
-                comp_pin = "gnd"
                 if re.search(signal.lower(), self.__filename): 
                     try:
-                        comp_pin = re.search(re.escape(signal) + r"_(\w+\d+_\w?\d+)", port).group(1) # need to match the comp_names
+                        comp_pin = re.search(re.escape(signal) + r"_(\w+\d+_\w?\d+)", port).group(1) 
                         end = comp_pin.find("_")
                         comp = comp_pin[:end]
                         if not re.search(comp, netlist.driver) and not re.search(comp, netlist.receiver):
-                            self.__append_node(comp_pin)
+                            self.__nodes.append(comp_pin)
                         elif re.search(comp, netlist.receiver):
-                            self.__set_rx_pin(comp_pin)
+                            self.__rx_pin = comp_pin
                         elif re.search(comp, netlist.driver):
-                            self.__set_tx_pin(comp_pin)
+                            self.__tx_pin = comp_pin
                     except:
-                        continue
-                f_obj.write(f"+ {comp_pin}\t\t\t* " + port)
+                        comp_pin = "gnd"
+            yield f"+ {comp_pin}\t\t\t* " + port
 
     def write_nodes(self, line):
-        targets = ["<node_name>", "<node_name_1>", "<node_name_2>"] # need to replace res_value
+        # Appends nodes to the Netlist section of the HSPICE script
+        placeholders = ["<node_name>", "<node_name_1>", "<node_name_2>"] # need to replace res_value
         substitutes = [ re.search(r"(\w+\d+)_", self.__nodes[0]).group(1) ]
         substitutes.extend(self.__nodes)
-        for i in range(len(targets)):
-            line = line.replace(targets[i], substitutes[i])
+        for i in range(len(placeholders)):
+            line = line.replace(placeholders[i], substitutes[i])
         return line
         
     def write_sim_type(self, line, types):
-        # Appends simulation type (ff, ss, or typ) depending on filename
+        # Appends simulation type (ff, ss, or typ) depending on filename 
+        # to the IBIS Model section of the HSPICE script
         for sim_type in types:
             if re.search(sim_type, self.__filename):
                 return line.replace("<typ>", sim_type)
@@ -77,42 +64,51 @@ class HspiceWriter():
     #     line = line.replace("<freq>", frequency)
     
     def write_stimuli(self, line, netlist):
-        # Appends stimuli parameter depending on whether signal is a clock or data
-        stimuli = self.__stimuli.copy()
-        stimuli["stimuli_param"] = "pulse(0 1 0 trf trf width clk)" if re.search("clk", self.__filename) \
+        # Appends stimuli parameters depending on whether signal is a clock or data 
+        # to the Stimuli section of the HSPICE script
+        stimuli_param = "pulse(0 1 0 trf trf width clk)" if re.search("clk", self.__filename) \
                 else "lfsr(0 1 trf+clk/4 trf trf tdrate 1 [7,6,5,4])"
-        if stimuli:
-           for key, value in stimuli.items():
-                match = re.search(r"(<" + key + r">)", line)
-                if match:
-                    comp = self.__tx_pin if key == "vi1" else self.__rx_pin
-                    line = line.replace(match.group(1), comp + value)
-                    # del stimuli[key]
+        placeholders = ["TX_pin_i", "TX_pin_en", "RX_pin_en", "stimuli_param"] # Possible placeholders in template
+        for i in range(len(placeholders)):
+            try:
+                match = re.search(r"(<" + placeholders[i] + r">)", line).group(1)
+                if match and i <= 1:
+                    line = line.replace(match,\
+                        placeholders[i].replace("TX_pin", self.__tx_pin))
+                elif match and i == 2:
+                    line = line.replace(match,\
+                        placeholders[i].replace("RX_pin", self.__rx_pin))
+                elif match and i == 3:
+                    line = line.replace(match, stimuli_param)
+            except:
+                continue
         return line
 
     def write_probes(self, line, comp_type):
+        # Appends the .probe lines 
+        # to the Output section of the HSPICE script
         assert comp_type in ["RX", "TX"], "comp_type not 'RX' or 'TX'"
-        targets = { 
+        placeholders = { 
             f"<{comp_type}_pin_i>" : "_i", 
             f"<{comp_type}_pin_o>" : "_o", 
             f"<{comp_type}_pin>" : "" 
         }
-        for key, value in targets.items():
+        for key, value in placeholders.items():
             comp_pin = self.__tx_pin if comp_type == "TX" else self.__rx_pin
-            line = line.replace(targets[key], comp_pin + value)
+            line = line.replace(key, comp_pin + value)
         return line
     
     def make_script(self, netlist):
-        # Calls instance methods to change lines in file
+        # Calls instance methods to alter the lines in the target HSPICE script
         with open(self.__filename, "r+") as f: # Open in append mode to avoid rewrite of 
             lines = f.readlines()
-            for i in range(len(lines)): 
+            for i in range(len(lines) + self.__params["num_of_ports"]): # Range accounts for line assertion in Netlist section 
                 lines[i] = self.write_params(lines[i]) 
                 if re.search(r"typ", lines[i]):
                     lines[i] = self.write_sim_type(lines[i], type(netlist).sim_types)
                 elif re.search(r"s\d_trace", lines[i]):
-                    # manipulate indices and insert netlist here instead of direct write via method
-                    self.write_netlist(netlist, f)
+                    # Inserts ports into `lines`
+                    lines = lines[:i+1] + [ port for port in self.write_port(netlist) ] + lines[i+1:]
                 elif re.search(r"\<node_name\>", lines[i]):
                     lines[i] = self.write_nodes(lines[i])
                 # >> For future implementations:
@@ -120,12 +116,13 @@ class HspiceWriter():
                 #     writer.write_frequency(line, frequency)
                 elif re.search(r"^v", lines[i]):
                     lines[i] = self.write_stimuli(lines[i], netlist)
-                elif re.search(r"^\+ v\(\<TX\)", lines[i]):
+                elif re.search(r"v\(<TX", lines[i]):
                     lines[i] = self.write_probes(lines[i], "TX")
-                elif re.search(r"^\+ v\(\<RX\)", lines[i]):
+                elif re.search(r"v\(<RX", lines[i]):
                     lines[i] = self.write_probes(lines[i], "RX")
             # f.writelines(lines)
             # >> For testing
+                print(i)
             return lines
 
 
@@ -161,7 +158,8 @@ class IbisBuilder():
 
     @property
     def files(self):
-        # Populates file_dict with subdir name as key and each value another dict with item:file as k:v pair
+        # Populates file_dict with subdir name as key 
+        # and each value another dict with item:file as k:v pair
         file_dict = {}
         for subdir in self.__subdirs:
             os.chdir(os.path.join(self.__dir, subdir))

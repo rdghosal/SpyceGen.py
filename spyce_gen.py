@@ -14,6 +14,9 @@ def main():
                     This program crawls through a Simulation directory to extract
                     paramaters used to substitute placeholders in a template and generate HSPICE scripts
                     for each net in each interface.
+
+                    For details on the directory structure necessary for this program to run error-free,
+                    please consult the README.
                   """
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("-p", "--path", nargs="?", required=True, help="Path to the simulation folder")

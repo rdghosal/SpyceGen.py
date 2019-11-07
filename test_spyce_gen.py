@@ -141,15 +141,15 @@ def test_make_script():
     t_spfile = os.path.join(os.getcwd(), "RX", "rgmii_rxclk_ff_.sp")
     print(t_spfile)
     t_hswriter = HspiceWriter(t_spfile, t_params) # `t_params` from `class.Netlist` test
-    expected_lines = []
+    expected_num_lines = 102
 
     # Execute
-    actual_lines = t_hswriter.make_script(t_netlist)
+    actual_num_lines = t_hswriter.make_script(t_netlist)
 
     # Verify
-    assert expected_lines == actual_lines
+    assert expected_num_lines == len(actual_num_lines)
 
-
+    # Teardown
 
 
 t_lines = {
