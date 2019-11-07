@@ -1,4 +1,4 @@
-#!/bin/env python3
+#!usr/bin/env python
 
 import os, re, sys, argparse
 from shutil import copyfile
@@ -14,7 +14,6 @@ def main():
                     This program crawls through a Simulation directory to extract
                     paramaters used to substitute placeholders in a template and generate HSPICE scripts
                     for each net in each interface.
-
                     For details on the directory structure necessary for this program to run error-free,
                     please consult the README.
                   """
@@ -29,7 +28,7 @@ def main():
         sys.exit(1)
 
     for if_dir in os.listdir(args.path):
-        i_builder = IbisBuilder(os.path.abspath(if_dir))
+        i_builder = IbisBuilder(os.path.join(args.path, if_dir))
 
         for params in i_builder.yield_params():
             params_str = stringify_params(params)
@@ -49,13 +48,18 @@ def main():
             clone_template(netlist, args.template)
 
             for comp_type in type(netlist).comp_types:
-                os.chdir(comp_type)
-                sp_files = os.listdir(".")
-
+                os.chdir(os.path.join(os.getcwd(), comp_type))
+                sp_files = [ f for f in os.listdir(".") if re.search(r"\.sp$", f) ]
+                # print(sp_files)
                 for sp_file in sp_files:
+                #     # print(os.path.abspath(sp_file))
+                    # f = open(sp_file, "r")
+                    # print(f.read())
+                    # break
                     hs_writer = HspiceWriter(sp_file, params)
                     hs_writer.make_script(netlist)
-                    print(f"{sp_file} written in folder {comp_type} of {if_dir}") # Print confirmation
+                #     print(f"{sp_file} written in folder {comp_type} of {if_dir}") # Print confirmation
+                os.chdir("..")
 
             print(f"HSPICE files generated for net {netlist.net_name}")
 

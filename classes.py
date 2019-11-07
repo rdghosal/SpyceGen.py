@@ -100,9 +100,9 @@ class HspiceWriter():
     
     def make_script(self, netlist):
         # Calls instance methods to alter the lines in the target HSPICE script
-        with open(self.__filename, "r+") as f: # Open in append mode to avoid rewrite of 
+        with open(self.__filename, "r+", encoding="utf8", errors="ignore") as f: # Open in append mode to avoid rewrite of 
             lines = f.readlines()
-            for i in range(len(lines) + self.__params["num_of_ports"]): # Range accounts for line assertion in Netlist section 
+            for i in range(len(lines) + self.__params["num_of_ports"]): # Range accounts for line assertion in Netlist section
                 lines[i] = self.write_params(lines[i]) 
                 if re.search(r"typ", lines[i]):
                     lines[i] = self.write_sim_type(lines[i], type(netlist).sim_types)
@@ -120,10 +120,9 @@ class HspiceWriter():
                     lines[i] = self.write_probes(lines[i], "TX")
                 elif re.search(r"v\(<RX", lines[i]):
                     lines[i] = self.write_probes(lines[i], "RX")
-            # f.writelines(lines)
+            f.writelines(lines)
             # >> For testing
-                print(i)
-            return lines
+            # return lines
 
 
 class IbisBuilder():
@@ -150,10 +149,12 @@ class IbisBuilder():
                     match = re.search(r"\.s(\d+)p$", file)
                     if match:
                         tstone_dict[subdir] = (file, int(match.group(1)))
-                        print("Found the tstonefile {0} for interface {1}".format(file, self.__name))
             else:
                 print("ERROR: Could not find 'S-Parameter folder for subdir {}".format(subdir))
                 sys.exit(1)
+        print("KEYS:", tstone_dict.keys())
+        # for key in tstone_dict:
+        #     print("Found the tstonefiles {0} for interface {1}".format(tstone_dict[key][0], self.__name))
         return tstone_dict   
 
     @property
@@ -212,7 +213,7 @@ class Netlist():
     sim_types = ["typ", "ff", "ss"]
 
     def __init__(self, params, root):
-        self.__dir = os.path.join(root, params["net_name"])
+        self.__dir = os.path.join(root, params["if_name"], params["net_name"])
         self.__params = params
         self.__ports = self.__set_ports()
         self.__signals = self.__set_signals()
