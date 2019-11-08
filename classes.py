@@ -58,11 +58,7 @@ class HspiceWriter():
         for sim_type in types:
             if re.search(sim_type, self.__filename):
                 return line.replace("<typ>", sim_type)
-    
-    # >> For future implementations:
-    # def write_frequency(self, line, frequency):
-    #     line = line.replace("<freq>", frequency)
-    
+                
     def write_stimuli(self, line, netlist):
         # Appends stimuli parameters depending on whether signal is a clock or data 
         # to the Stimuli section of the HSPICE script
@@ -111,9 +107,6 @@ class HspiceWriter():
                     lines = lines[:i+1] + [ port for port in self.write_port(netlist) ] + lines[i+1:]
                 elif re.search(r"\<node_name\>", lines[i]):
                     lines[i] = self.write_nodes(lines[i])
-                # >> For future implementations:
-                # elif re.search(r"\<freq\>", line):
-                #     writer.write_frequency(line, frequency)
                 elif re.search(r"^v", lines[i]):
                     lines[i] = self.write_stimuli(lines[i], netlist)
                 elif re.search(r"v\(<TX", lines[i]):
