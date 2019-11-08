@@ -39,7 +39,7 @@ More important, however, is the existence of the `.ibs` and `.pkg` files within 
 5. Files other than those described above may be critical to the ultimate simulation outputs, though their existence and location within the directory are not relevant to the function of SpyceGen.
 
 ### 2. TEMPLATE (-t/--template) 
-All produced scripts are based on a template file, the contents of which are edited by SpyceGen to reflect parameters extracted from other files in the directory.
+All produced scripts are based on a template file, the contents of which are edited by SpyceGen to reflect parameters extracted from other files in the directory. The template should be a text file.
 
 ## IV. Outputs
 ### HSPICE script files
