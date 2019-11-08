@@ -1,4 +1,4 @@
-# SpyceGen
+# SpyceGen.py
 Last updated: 7 November 2019
 
 ## USAGE

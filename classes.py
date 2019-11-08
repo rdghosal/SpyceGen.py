@@ -210,7 +210,7 @@ class Netlist():
 
     def __init__(self, params, root):
         self.__dir = os.path.join(root, params["if_name"], params["net_name"])
-        self.__params = params
+        self.__params = params.copy() # Avoid side effects when manipulated by methods
         self.__ports = self.__set_ports()
         self.__signals = self.__set_signals()
         self.driver = params["TX"]
