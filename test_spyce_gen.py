@@ -76,10 +76,14 @@ t_params = {
     'tstonefile': 'yyMMdd_test_tstonefile.s17p', 
     'num_of_ports': 17, 
     'TX': 'IB01', 
+    'TX_comp': '',
     'TX_ibs': 'sak-tc397xe256f300sa.ibs', 
+    'TX_package': '',
     'TX_pkg': '', 
     'RX': 'IZ01', 
+    'RX_comp': '',
     'RX_ibs': 'e6352_e6176.ibs', 
+    'RX_package': '',
     'RX_pkg': 'sak-tc397xe256f300sa.pkg'
     }
 t_netlist = Netlist(t_params, os.path.split(t_root)[0])
