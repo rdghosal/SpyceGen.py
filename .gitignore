@@ -1,0 +1,8 @@
+*.swp
+temp
+gui
+spyce_gen__UI
+Simulation
+*.code-workspace
+__pycache__/*
+old_*

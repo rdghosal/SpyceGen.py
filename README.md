@@ -1,5 +1,9 @@
 # SpyceGen.py
+<<<<<<< HEAD
 Last updated: 15 November 2019
+=======
+Last updated: 7 November 2019
+>>>>>>> 4935a5aa34de9bcc51b41c8e52d2a9cfc332c0d6
 
 ## USAGE
 ```
@@ -31,7 +35,11 @@ Specifically, the input path **must** have a structure like the following:
 
 Here, the *root directory* is passed as an argument to the program at execution (marked by the flag -p/--path), wherein:
 1. The root folder must be named *Simulation*.
+<<<<<<< HEAD
 2. One or more arbitrarily named *subdirectories*, such as `RGMII_IZ01_IB01` here. (This may become optional in the future). 
+=======
+2. One or more *subdirectories*, such as `RGMII_IZ01_IB01` here. (This may become optional in the future).
+>>>>>>> 4935a5aa34de9bcc51b41c8e52d2a9cfc332c0d6
 3. The *S-Parameter* folder must contain the touchstone file, whose file extension must match the regex pattern `\.s\d+p$` .
 4. *IB01* and *IZ01* are optional, arbitrarily named folders (in this example, they were named according to the driver and receiver of the target net). 
 More important, however, is the existence of the `.ibs` and `.pkg` files within them, which, though not critical to the function of SpyceGen, will influence the ultimate simulation outputs.
@@ -52,4 +60,8 @@ SpyceGen requires a specific directory structure while making assumptions about 
 
 Besides refactoring for greater reusability, there are plans to implement a GUI for greater usability.
 
+<<<<<<< HEAD
 Contributions to make this project more widely applicable are always welcome.
+=======
+Contributions to make this project more widely applicable are always welcome.
+>>>>>>> 4935a5aa34de9bcc51b41c8e52d2a9cfc332c0d6
