@@ -8,9 +8,9 @@ python spyce_gen.py -p PATH -t TEMPLATE // These two flags are REQUIRED
 ```
 
 ## I. Purpose
-SpyceGen is a program designed to generate scripts to operate Synopys's HSPICE printed-circuit board (PCB) simulation program (https://www.synopsys.com/content/dam/synopsys/verification/datasheets/hspice-ds.pdf).
+SpyceGen is a program designed to generate scripts to operate Synopsys's HSPICE printed-circuit board (PCB) simulation program (https://www.synopsys.com/content/dam/synopsys/verification/datasheets/hspice-ds.pdf).
 
-Thus, the program aims to automate a particular step in PCB simulation, which until now, is conducted manual by tedious, error-prone copy-pasting.
+Thus, the program aims to automate a particular step in PCB simulation, which until now, is conducted manually by tedious, error-prone copy-pasting.
 
 ## II. Background
 SpyceGen was intended to solve bottlenecks of a specific workflow that involves using outputs from Anysys SIwave as inputs for Synopsys HSPICE. As such, for the program to satisfy its Purpose, the initial directory path must, in one or more of its subdirectories, contain at least one *touchstone* file.
