@@ -33,6 +33,7 @@ def main():
             params_str = stringify_params(params)
             
             if not get_user_conf(i_builder.name, params_str):
+                print(f"\nAn error occured. Please check {i_builder.name} and run this program again.")
                 sys.exit(1)
 
             netlist = Netlist(params, args.path)

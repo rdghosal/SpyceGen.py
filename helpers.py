@@ -47,7 +47,6 @@ def get_user_conf(obj_name, param):
         sleep(1)
         user_conf = input("\nAre the above parameters correct? (y/n) ")
     if user_conf is "n":
-        print(f"\nAn error occured. Please check {obj_name} and run this program again.")
         return False
     else:
         return True

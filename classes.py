@@ -181,7 +181,6 @@ class IbisBuilder():
                 "tstonefile": "",
                 "num_of_ports": 0,
                 "TX": "",
-<<<<<<< HEAD
                 "TX_comp": "",
                 "TX_ibs": "",
                 "TX_package": "",
@@ -190,12 +189,6 @@ class IbisBuilder():
                 "RX_comp": "",
                 "RX_ibs": "",
                 "RX_package": "",
-=======
-                "TX_ibs": "",
-                "TX_pkg": "",
-                "RX": "",
-                "RX_ibs": "",
->>>>>>> 4935a5aa34de9bcc51b41c8e52d2a9cfc332c0d6
                 "RX_pkg": "",
             }
             for file_key in self.files.keys():
