@@ -1,0 +1,10 @@
+__init__.py
+classes.py
+helpers.py
+setup.py
+spyce_gen.py
+spyce_gen.egg-info/PKG-INFO
+spyce_gen.egg-info/SOURCES.txt
+spyce_gen.egg-info/dependency_links.txt
+spyce_gen.egg-info/entry_points.txt
+spyce_gen.egg-info/top_level.txt

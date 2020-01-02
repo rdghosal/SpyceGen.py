@@ -1,0 +1,3 @@
+[console_scripts]
+spyce-gen = spyce_gen:main
+
